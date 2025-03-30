@@ -1,5 +1,6 @@
 import treeswift
 import argparse
+import warnings
 
 
 def unroot(tree):
@@ -26,14 +27,16 @@ def unroot(tree):
 
 
 def reroot_on_edge(tree, node):
-    if not node.is_root():
-        if (
-            not hasattr(node, "edge_length")
-            or node.edge_length is None
-            or node.edge_length == 0
-        ):
-            node.edge_length = 1
-        tree.reroot(node, length=node.edge_length / 2)
+    # suppress reroot is maybe buggy warning from treeswift
+    with warnings.catch_warnings(action="ignore"):
+        if not node.is_root():
+            if (
+                not hasattr(node, "edge_length")
+                or node.edge_length is None
+                or node.edge_length == 0
+            ):
+                node.edge_length = 1
+            tree.reroot(node, length=node.edge_length / 2)
 
 
 def remove_in_paralogs(tree, gene_to_species=lambda x: x):
@@ -190,7 +193,6 @@ def get_min_root(tree, gene_to_species=lambda x: x, verbose=False):
                 ties.append(node)
 
             if total_score < min_score:
-                num_ties = 0
                 min_score = total_score
                 best_root = node
                 ties = [node]
@@ -242,17 +244,19 @@ def decompose(tree, single_tree=False):
 
     Returns result of the decomposition as a list of trees
     """
-    out = []
-    for node in tree.traverse_postorder(leaves=False):
-        if node.tag == "D":
-            # trim off smallest subtree (i.e. subtree with least species)
-            [left, right] = node.child_nodes()
-            delete = left if len(left.s) < len(right.s) else right
-            if not single_tree:
-                out.append(tree.extract_subtree(delete))
-                out[-1].suppress_unifurcations()
-            node.remove_child(delete)
-    tree.suppress_unifurcations()  # all the duplication nodes will be unifurcations
+    # suppress node deletion warnings
+    with warnings.catch_warnings(action="ignore"):
+        out = []
+        for node in tree.traverse_postorder(leaves=False):
+            if node.tag == "D":
+                # trim off smallest subtree (i.e. subtree with least species)
+                [left, right] = node.child_nodes()
+                delete = left if len(left.s) < len(right.s) else right
+                if not single_tree:
+                    out.append(tree.extract_subtree(delete))
+                    out[-1].suppress_unifurcations()
+                node.remove_child(delete)
+        tree.suppress_unifurcations()  # all the duplication nodes will be unifurcations
     out.append(tree)
     return out
 
@@ -376,7 +380,7 @@ def main(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
-        description="====================== DISCO v1.4.0 ======================"
+        description="====================== DISCO v1.4.1 ======================"
     )
 
     parser.add_argument(
