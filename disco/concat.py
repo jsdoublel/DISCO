@@ -1,4 +1,3 @@
-import argparse
 import csv
 import os
 
@@ -45,7 +44,7 @@ def retrieve_alignment(tree, aln_path, format, taxa_set, label_to_species):
     return result
 
 
-def main(args):
+def concat_main(args):
     input_alignments = [row for row in csv.reader(open(args.alignment, "r"))]
     label_to_species = lambda x: x.split(args.delimiter)[0]
     tree_list = ts.read_tree_newick(args.input)
@@ -94,45 +93,3 @@ def main(args):
                     f.write(f"{model}, {gene_name}={partition}\n")
 
     AlignIO.write(aln, f"{args.output_prefix}-aln.{args.format[:3]}", args.format)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="generate concatenation files from gene-family trees using decomposition strategies"
-    )
-
-    parser.add_argument(
-        "-i", "--input", type=str, help="input tree list file", required=True
-    )
-    parser.add_argument(
-        "-o", "--output-prefix", type=str, required=True, help="output tree list file"
-    )
-    parser.add_argument(
-        "-a", "--alignment", required=True, type=str, help="alignment files list"
-    )
-    parser.add_argument(
-        "-f",
-        "--format",
-        choices=["phylip", "fasta"],
-        required=True,
-        help="alignment file format",
-    )
-    parser.add_argument(
-        "-d",
-        "--delimiter",
-        type=str,
-        default="_",
-        help="delimiter separating taxon label from the rest of the leaf label.",
-    )
-    parser.add_argument(
-        "-m",
-        "--filter",
-        type=int,
-        default=4,
-        help="exclude decomposed trees with less then X taxa",
-    )
-    parser.add_argument(
-        "-p", "--partition", action="store_true", help="generate partition file"
-    )
-
-    main(parser.parse_args())

@@ -1,5 +1,4 @@
 import treeswift
-import argparse
 import warnings
 
 
@@ -267,7 +266,7 @@ def relabel(tree, gene_to_species=lambda x: x):
     return tree
 
 
-def main(args):
+def decomp_main(args):
 
     if args.delimiter is not None:
         gene_to_species = lambda x: args.delimiter.join(
@@ -375,74 +374,3 @@ def main(args):
                                 for child in og_tree.root.child_nodes()
                             )
                             outgfile.write("{" + ",".join(outgroup[1]) + "}\n")
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
-        description="====================== DISCO v1.4.1 ======================"
-    )
-
-    parser.add_argument(
-        "-i", "--input", type=str, help="Input tree list file", required=True
-    )
-    parser.add_argument("-o", "--output", type=str, help="Output tree list file")
-    parser.add_argument(
-        "-d",
-        "--delimiter",
-        type=str,
-        help="Delimiter separating species name from rest of leaf label",
-    )
-    parser.add_argument(
-        "-n",
-        "--nth-delimiter",
-        type=int,  # Default is 1 -- set below
-        help="Split on nth delimiter (only works with -d)",
-    )
-    parser.add_argument(
-        "-m", "--minimum", type=int, help="Minimum tree size outputted", default=4
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enables verbose output"
-    )
-    parser.add_argument(
-        "--keep-labels",
-        action="store_true",
-        help="Keep original leaf labels instead of relabeling them with their species labels (only relevant with delimiter)",
-    )
-    parser.add_argument(
-        "--single_tree", action="store_true", help="Only output single large tree"
-    )
-    parser.add_argument(
-        "--no-decomp",
-        action="store_true",
-        help="Outputs rooted trees without decomposition",
-    )
-    parser.add_argument(
-        "--outgroups",
-        action="store_true",
-        help="Output outgroups to file (including ties)",
-    )
-    parser.add_argument(
-        "--remove_in_paralogs",
-        action="store_true",
-        help="Remove in-paralogs before rooting/scoring tree.",
-    )
-
-    args = parser.parse_args()
-    if args.delimiter is None:
-        if args.nth_delimiter is not None:
-            parser.error("Cannot set -n without a delimiter")
-        if args.keep_labels:
-            parser.error("Cannot use --keep-labels without a delimiter")
-    elif args.nth_delimiter is None:
-        args.nth_delimiter = 1
-    if args.single_tree and args.no_decomp:
-        parser.error("Cannot combine --single_tree and --no-decomp")
-    if not args.verbose and args.remove_in_paralogs:
-        print(
-            "--remove_in_paralogs is meaningless without --verbose, as it does not change the optimal rooting. "
-            + "It may also slow the program."
-        )
-
-    main(args)
