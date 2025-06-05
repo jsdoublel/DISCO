@@ -1,6 +1,6 @@
 # DISCO
 
-Decomposition Into Single-COpy gene trees ([DISCO](https://doi.org/10.1093/sysbio/syab070)) is a method for decomposing multi-copy gene-family trees while attempting to preserve orthologs and discard paralogs. These single-copy gene trees can be subsequently used by methods that can estimate species trees from single-copy gene trees such as [ASTRAL](https://github.com/smirarab/ASTRAL) or [ASTRID](https://github.com/pranjalv123/ASTRID) in order to obtain an accurate estimation of the species tree. Additionally, DISCO can be paired with concatenation analysis using the script `ca_disco.py`. 
+Decomposition Into Single-COpy gene trees ([DISCO](https://doi.org/10.1093/sysbio/syab070)) is a method for decomposing multi-copy gene-family trees while attempting to preserve orthologs and discard paralogs. These single-copy gene trees can be subsequently used by methods that can estimate species trees from single-copy gene trees such as [ASTRAL](https://github.com/smirarab/ASTRAL) or [ASTRID](https://github.com/pranjalv123/ASTRID) in order to obtain an accurate estimation of the species tree. Additionally, DISCO can be paired with concatenation analysis with methods such as [RAxML](https://github.com/amkozlov/raxml-ng). 
 
 > **NOTE:** For species tree estimation default settings are recommended; however, for orthology detection using `-m 2` is recommended so small groups are retrieved. It is also highly recommended that you use the most recent version of DISCO, as it applies the latest bugfixes (see [changelog](CHANGELOG.md)). 
 <!-- **NOTE:** At present, it is recommended to use the latest version if you want to run the DISCO algorithm as described in Willson et al. 2021, as using earlier versions can causes results inconsistent with the DISCO algorithm in rare cases. -->
@@ -8,6 +8,12 @@ Decomposition Into Single-COpy gene trees ([DISCO](https://doi.org/10.1093/sysbi
 ## Citation
 
 If you use DISCO, please cite:
+
+> Willson, James, Mrinmoy Saha Roddur, Baqiao Liu, Paul Zaharias, and Tandy Warnow. “DISCO: species tree inference using multicopy gene family tree decomposition.” *Systematic Biology* 71, no. 3 (2022): 610-629.
+
+<details>
+	<summary>bibtex</summary>
+
 ```
 @article{willson2022disco,
   title={DISCO: Species tree inference using multicopy gene family tree decomposition},
@@ -20,6 +26,7 @@ If you use DISCO, please cite:
   publisher={Oxford University Press}
 }
 ```
+</details>
 
 ## Algorithm
 
@@ -37,14 +44,16 @@ Treeswift can be installed with: `pip install treeswift`
 
 ## Usage
 
-### disco.py
+The `disco` command has two subcommands: `decomp`, used to obtain single-copy trees through gene tree decomposition, and `concat` used to create concatenated alignments with the disco decomposition. The usage of these subcommands is outlined below. A help message can be displayed for either subcommand by running `disco <command> -h`.
+
+### `decomp`
 
 **Input**: File containing list of multi-copy trees in newick format
 
 **Output**: File containing resulting list of single-copy trees after decomposition in newick format
 
 ```
-python3 disco.py -i <input_file> -o <ouput_file> -d <delimiter>
+disco decomp -i <input_file> -o <ouput_file> -d <delimiter>
 ```
 
 #### Arguments
@@ -73,20 +82,20 @@ python3 disco.py -i <input_file> -o <ouput_file> -d <delimiter>
 #### Example
 
 ```bash
-python3 disco.py -i example/gtrees-mult.trees
+disco decomp -i example/gtrees-mult.trees
 ```
 
-### ca_disco.py
+### `concat`
 
 **Input**: File containing list of multi-copy trees in newick format and set of alignment files corresponding to the gene families.
 
 **Output**: Concatenated alignment file
 
 ```
-python3 ca_disco.py -i <input_trees> -a <aln_list> -o <output> -d <delimiter> -m <number> 
+disco concat -i <input_trees> -a <aln_list> -o <output> -d <delimiter> -m <number> 
 ```
 
-`disco.py` must be present in the same directory as `ca_disco.py` in order for it to run. Also, unlike `disco.py`, it is necessary for the input newick trees given to `ca_disco.py` to have unique leaf labels where the taxon name comes first and is separated from the rest of the name by some delimiter. 
+It is necessary for the input newick trees given to `disco concat` to have unique leaf labels where the taxon name comes first and is separated from the rest of the name by some delimiter. 
 
 The `-a` argument should be given the path to an "alignment list" file containing the path to each alignment file you want to concatinate separated by a new line. The order of the alignment files is important---for each tree in the input newick tree file, there should be a corresponding alignment on the same line in the respective alignment list file.  
 
@@ -111,12 +120,12 @@ The `-a` argument should be given the path to an "alignment list" file containin
 #### Example
 
 ```bash 
-python3 ca_disco.py -i example/g_100.trees -o example.phy -a example/seq_list.csv -f phylip
+disco concat -i example/g_100.trees -o example.phy -a example/seq_list.csv -f phylip
 ```
 
 #### Partition File
 
-`ca_disco.py` now has the option to create a partition file; this can be done with the optional `-p` argument. If this argument is specified, it is necessary to provide relavent information in the alignment list file. For example, see `example/seq_list.csv`. This would generate a partition file like so:
+`disco concat` now has the option to create a partition file; this can be done with the optional `-p` argument. If this argument is specified, it is necessary to provide relavent information in the alignment list file. For example, see `example/seq_list.csv`. This would generate a partition file like so:
 ```
 GTR+G, 0001=1-200
 GTR+G, 0002=201-700
