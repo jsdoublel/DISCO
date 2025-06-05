@@ -2,19 +2,8 @@
 
 Decomposition Into Single-COpy gene trees ([DISCO](https://doi.org/10.1093/sysbio/syab070)) is a method for decomposing multi-copy gene-family trees while attempting to preserve orthologs and discard paralogs. These single-copy gene trees can be subsequently used by methods that can estimate species trees from single-copy gene trees such as [ASTRAL](https://github.com/smirarab/ASTRAL) or [ASTRID](https://github.com/pranjalv123/ASTRID) in order to obtain an accurate estimation of the species tree. Additionally, DISCO can be paired with concatenation analysis using the script `ca_disco.py`. 
 
-**NOTE:** For species tree estimation default settings are recommended; however, for orthology detection using `-m 2` is recommended so small groups are retrieved. It is also highly recommended that you use the most recent version of DISCO, as it deals with some limitations of TreeSwift.
-
-## Versions
-
-- v1.0 (May 21st 2021): Initial Release
-- v1.1 (July 19th, 2021): Added `ca_disco.py` and adjustable filter (instead of just filtering all trees with less than 4 taxa)
-- v1.2 (June 8th, 2022): Tree rerooting fix (addresses issue with treeswift rooting with no edge lengths)
-- v1.3 (July 8th, 2022): Allows for more flexibility with leaf labels
-- v1.3.1 (October 31st, 2022): Fixes issue where extra newline character at the end of the file causes a crash 
-- v1.4.0 (April 21st, 2024): Added ability to make a partition file to CA-DISCO
-- v1.4.1 (March 30th, 2025): Suppressed unecessary warning added by treeswift (explained [here](https://github.com/jsdoublel/DISCO/issues/6)) that spammed output.
-
-**Note:** At present, it is recommended to use the latest version if you want to run the DISCO algorithm as described in Willson et al. 2021, as using earlier versions can causes results inconsistent with the DISCO algorithm in rare cases. 
+> **NOTE:** For species tree estimation default settings are recommended; however, for orthology detection using `-m 2` is recommended so small groups are retrieved. It is also highly recommended that you use the most recent version of DISCO, as it applies the latest bugfixes (see [changelog](CHANGELOG.md)). 
+<!-- **NOTE:** At present, it is recommended to use the latest version if you want to run the DISCO algorithm as described in Willson et al. 2021, as using earlier versions can causes results inconsistent with the DISCO algorithm in rare cases. -->
 
 ## Citation
 

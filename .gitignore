@@ -3,4 +3,5 @@ __pycache__/
 .python-version
 build/
 *.egg-info/
+*.pdf
 
