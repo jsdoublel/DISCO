@@ -1,5 +1,4 @@
 import argparse
-import sys
 import disco
 from disco.decomp import decomp_main
 from disco.concat import concat_main
@@ -103,7 +102,15 @@ def main():
     args = parser.parse_args()
     match args.command:
         case "concat":
-            concat_main(args)
+            concat_main(
+                args.input,
+                args.alignment,
+                args.output_prefix,
+                args.delimiter,
+                args.format,
+                args.filter,
+                args.partition,
+            )
         case "decomp", _:
             if args.delimiter is None:
                 if args.nth_delimiter is not None:
@@ -119,4 +126,16 @@ def main():
                     "--remove_in_paralogs is meaningless without --verbose, as it does not change the optimal rooting. "
                     + "It may also slow the program."
                 )
-            decomp_main(args)
+            decomp_main(
+                args.input,
+                args.output,
+                args.delimiter,
+                args.nth_delimiter,
+                args.minimum,
+                args.single_tree,
+                args.keep_labels,
+                args.outgroups,
+                args.remove_in_paralogs,
+                args.no_decomp,
+                args.verbose,
+            )

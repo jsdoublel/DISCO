@@ -7,7 +7,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import treeswift as ts
 
-from disco import *
+from disco.decomp import *
 
 
 def retrieve_alignment(tree, aln_path, format, taxa_set, label_to_species):
@@ -44,10 +44,18 @@ def retrieve_alignment(tree, aln_path, format, taxa_set, label_to_species):
     return result
 
 
-def concat_main(args):
-    input_alignments = [row for row in csv.reader(open(args.alignment, "r"))]
-    label_to_species = lambda x: x.split(args.delimiter)[0]
-    tree_list = ts.read_tree_newick(args.input)
+def concat_main(
+    input_file_name: str,
+    alignment_file_name: str,
+    output_prefix: str,
+    delimiter: str,
+    format: str,
+    filter: int = 2,
+    partition: bool = False,
+):
+    input_alignments = [row for row in csv.reader(open(alignment_file_name, "r"))]
+    label_to_species = lambda x: x.split(delimiter)[0]
+    tree_list = ts.read_tree_newick(input_file_name)
     assert not isinstance(tree_list, ts.Tree)
     taxa_set = set(
         label
@@ -68,13 +76,11 @@ def concat_main(args):
         tree.reroot(get_min_root(tree, label_to_species)[0])
         tag(tree, label_to_species)
         disco_trees = list(
-            filter(
-                lambda x: x.num_nodes(internal=False) >= args.filter, decompose(tree)
-            )
+            filter(lambda x: x.num_nodes(internal=False) >= filter, decompose(tree))
         )
         for dtree in disco_trees:
             aln += retrieve_alignment(
-                dtree, aln_file, args.format, taxa_set, label_to_species
+                dtree, aln_file, format, taxa_set, label_to_species
             )
         if aln.get_alignment_length() + 1 != p_index:
             partitions.append(f"{p_index:d}-{aln.get_alignment_length():d}")
@@ -82,8 +88,8 @@ def concat_main(args):
         else:
             partitions.append("empty")
 
-    if args.partition:
-        with open(f"{args.output_prefix}-partitions.txt", "w") as f:
+    if partition:
+        with open(f"{output_prefix}-partitions.txt", "w") as f:
             assert all(
                 len(x) == 2 for x in input_alignments
             ), "alignment list file format problem"
@@ -92,4 +98,4 @@ def concat_main(args):
                     gene_name = aln_file.split(os.sep)[-1].split(".")[0]
                     f.write(f"{model}, {gene_name}={partition}\n")
 
-    AlignIO.write(aln, f"{args.output_prefix}-aln.{args.format[:3]}", args.format)
+    AlignIO.write(aln, f"{output_prefix}-aln.{format[:3]}", format)
