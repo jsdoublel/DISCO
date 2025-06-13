@@ -43,8 +43,9 @@ Given a list of multi-copy gene trees, DISCO does the following for each tree:
 
 - Python 3
 - [TreeSwift](https://github.com/niemasd/TreeSwift)
+- [Biopython](https://biopython.org/) (for `ca_disco.py)
 
-Treeswift can be installed with: `pip install treeswift`
+Treeswift can be installed with `pip install treeswift` and Biopython can be installed with `biopython`.
 
 ## Usage
 
