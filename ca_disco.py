@@ -1,6 +1,7 @@
 import argparse
 import csv
 import os
+import warnings
 
 from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
@@ -66,7 +67,8 @@ def main(args):
     p_index = 1
 
     for (aln_file, *_), tree in zip(input_alignments, tree_list):
-        tree.reroot(get_min_root(tree, label_to_species)[0])
+        with warnings.catch_warnings(action="ignore"):
+            tree.reroot(get_min_root(tree, label_to_species)[0])
         tag(tree, label_to_species)
         disco_trees = list(
             filter(
