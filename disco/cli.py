@@ -6,7 +6,7 @@ from disco.concat import concat_main
 
 def build_parser():
     parser = argparse.ArgumentParser(
-        prog="disco", description=f"DISCO {disco.__version__}"
+        prog="disco", description=f"DISCO v{disco.__version__}"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     # Decomp parser

@@ -75,9 +75,9 @@ def concat_main(
     for (aln_file, *_), tree in zip(input_alignments, tree_list):
         tree.reroot(get_min_root(tree, label_to_species)[0])
         tag(tree, label_to_species)
-        disco_trees = list(
-            filter(lambda x: x.num_nodes(internal=False) >= filter, decompose(tree))
-        )
+        disco_trees = [
+            x for x in decompose(tree) if x.num_nodes(internal=False) >= filter
+        ]
         for dtree in disco_trees:
             aln += retrieve_alignment(
                 dtree, aln_file, format, taxa_set, label_to_species

@@ -1,1 +1,3 @@
-__version__ = "v1.5.0"
+from importlib.metadata import version
+
+__version__ = version("disco-gdl")

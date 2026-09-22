@@ -367,15 +367,15 @@ def decomp_main(
             # output outgroups
             if outgroups:
                 og_tree = treeswift.read_tree_newick(line)
-                root, score, ties = get_min_root(og_tree, delimiter)
+                root, score, ties = get_min_root(og_tree, gene_to_species)
                 reroot_on_edge(og_tree, root)
-                tag(og_tree, delimiter)
+                tag(og_tree, gene_to_species)
                 if len(og_tree.root.s) >= 2 and og_tree.n_dup >= 1:
                     with open(outgroup_file_name, "a") as outgfile:
                         outgfile.write("Tree " + str(i) + ":\n")
                         for t in ties:
                             reroot_on_edge(og_tree, t)
-                            tag(og_tree, delimiter)
+                            tag(og_tree, gene_to_species)
                             outgroup = min(
                                 (len(child.s), child.s)
                                 for child in og_tree.root.child_nodes()
