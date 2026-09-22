@@ -277,8 +277,8 @@ def decomp_main(
     keep_labels: bool = False,
     outgroups: bool = False,
     inparalogs: bool = False,
-    verbose: bool = False,
     no_decomp: bool = False,
+    verbose: bool = False,
 ):
 
     if delimiter is not None:
@@ -361,11 +361,7 @@ def decomp_main(
 
             if verbose:
                 print(
-                    "Decomposition strategy outputted",
-                    len(out),
-                    "tree(s) with minimum size",
-                    minimum,
-                    ".\n",
+                    f"Decomposition strategy outputted {len(out)} tree(s) with minimum size {minimum}\n"
                 )
 
             # output outgroups

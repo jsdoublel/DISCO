@@ -111,7 +111,7 @@ def main():
                 args.filter,
                 args.partition,
             )
-        case "decomp", _:
+        case "decomp":
             if args.delimiter is None:
                 if args.nth_delimiter is not None:
                     parser.error("Cannot set -n without a delimiter")
@@ -139,3 +139,5 @@ def main():
                 args.no_decomp,
                 args.verbose,
             )
+        case _:
+            print(f"invalid command {args.command}")
