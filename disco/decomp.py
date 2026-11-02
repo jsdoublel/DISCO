@@ -1,3 +1,4 @@
+import os
 import treeswift
 import warnings
 from typing import Union
@@ -287,13 +288,13 @@ def decomp_main(
         gene_to_species = lambda x: x
 
     if output_file_name is None:
-        split = input_file_name.rsplit(".", 1)
-        output = split[0] + "-decomp." + split[1]
+        base, ext = os.path.splitext(input_file_name)
+        output = base + "-decomp" + ext
     else:
         output = output_file_name
 
     # delete existing outgroup file (so you don't append to it)
-    outgroup_file_name = input_file_name.rsplit(".", 1)[0] + "_outgroups.txt"
+    outgroup_file_name = os.path.splitext(input_file_name)[0] + "_outgroups.txt"
     if outgroups:
         open(outgroup_file_name, "w").close()
 

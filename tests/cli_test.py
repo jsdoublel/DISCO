@@ -33,7 +33,7 @@ def test_keep_labels_without_delimiter_errors():
 
 def test_single_tree_and_no_decomp_together_errors():
     result = run_cli(
-        "decomp", "-i", str(GTREES), "--single_tree", "--no-decomp"
+        "decomp", "-i", str(GTREES), "--single-tree", "--no-decomp"
     )
     assert result.returncode != 0
-    assert "Cannot combine --single_tree and --no-decomp" in result.stderr
+    assert "Cannot combine --single-tree and --no-decomp" in result.stderr

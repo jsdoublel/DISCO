@@ -5,3 +5,5 @@ build/
 *.egg-info/
 *.pdf
 
+dist/
+example/*-decomp.trees

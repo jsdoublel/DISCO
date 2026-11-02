@@ -39,7 +39,7 @@ def build_parser():
         help="Keep original leaf labels instead of relabeling them with their species labels (only relevant with delimiter)",
     )
     decomp.add_argument(
-        "--single_tree", action="store_true", help="Only output single large tree"
+        "-s", "--single-tree", action="store_true", help="Only output single large tree"
     )
     decomp.add_argument(
         "--no-decomp",
@@ -52,7 +52,7 @@ def build_parser():
         help="Output outgroups to file (including ties)",
     )
     decomp.add_argument(
-        "--remove_in_paralogs",
+        "--remove-in-paralogs",
         action="store_true",
         help="Remove in-paralogs before rooting/scoring tree.",
     )
@@ -120,10 +120,10 @@ def main():
             elif args.nth_delimiter is None:
                 args.nth_delimiter = 1
             if args.single_tree and args.no_decomp:
-                parser.error("Cannot combine --single_tree and --no-decomp")
+                parser.error("Cannot combine --single-tree and --no-decomp")
             if not args.verbose and args.remove_in_paralogs:
                 print(
-                    "--remove_in_paralogs is meaningless without --verbose, as it does not change the optimal rooting. "
+                    "--remove-in-paralogs is meaningless without --verbose, as it does not change the optimal rooting. "
                     + "It may also slow the program."
                 )
             decomp_main(

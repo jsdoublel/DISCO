@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.5.0](https://github.com/jsdoublel/DISCO/releases/tag/v1.5.0) - 2026-11-02
+
+DISCO is now an installable Python package (`pip install disco-gdl`).
+
+- `disco.py` and `ca_disco.py` are replaced by a single `disco` command with `decomp` and `concat` subcommands
+- Flags renamed for consistency: `--single_tree` is now `-s`/`--single-tree` and `--remove_in_paralogs` is now `--remove-in-paralogs`
+- Fixed `concat` rerooting at the best-scoring node instead of on its incident edge, which occasionally produced a non-optimal tagging/decomposition (and hence different alignments than `decomp` would imply). It also no longer spams TreeSwift rerooting warnings
+- Fixed default `decomp` output/outgroup file names for input paths without an extension or starting with `./`
+- Added a test suite
+
 ## [v1.4.1](https://github.com/jsdoublel/DISCO/releases/tag/v1.4.1) - 2025-03-30 
 
 Suppressed unecessary warning added by treeswift (explained [here](https://github.com/jsdoublel/DISCO/issues/6)) that spammed output.

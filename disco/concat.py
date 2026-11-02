@@ -7,7 +7,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import treeswift as ts
 
-from disco.decomp import *
+from disco.decomp import decompose, get_min_root, reroot_on_edge, tag
 
 
 def retrieve_alignment(tree, aln_path, format, taxa_set, label_to_species):
@@ -50,7 +50,7 @@ def concat_main(
     output_prefix: str,
     delimiter: str,
     format: str,
-    filter: int = 2,
+    filter: int = 4,
     partition: bool = False,
 ):
     input_alignments = [row for row in csv.reader(open(alignment_file_name, "r"))]
@@ -73,7 +73,7 @@ def concat_main(
     p_index = 1
 
     for (aln_file, *_), tree in zip(input_alignments, tree_list):
-        tree.reroot(get_min_root(tree, label_to_species)[0])
+        reroot_on_edge(tree, get_min_root(tree, label_to_species)[0])
         tag(tree, label_to_species)
         disco_trees = [
             x for x in decompose(tree) if x.num_nodes(internal=False) >= filter
