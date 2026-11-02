@@ -7,3 +7,4 @@ build/
 
 dist/
 example/*-decomp.trees
+uv.lock
