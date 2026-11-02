@@ -1,0 +1,58 @@
+name: Publish to PyPI
+
+# Runs when a GitHub release is published. The release's tag must match the
+# version in pyproject.toml (e.g. tag v1.5.0 for version 1.5.0).
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # tests compare against the v1.4.1 release, so they need tags/history
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Check tag matches package version
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Release tag '${GITHUB_REF_NAME}' does not match pyproject.toml version '${version}' (expected 'v${version}')"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: uv run --extra test pytest
+
+      - name: Build distributions
+        run: uv build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    # Must match the environment name entered in PyPI's trusted publisher form
+    environment:
+      name: pypi
+      url: https://pypi.org/project/disco-gdl/
+    permissions:
+      id-token: write # required for trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
