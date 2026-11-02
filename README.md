@@ -1,5 +1,10 @@
 # DISCO
 
+[![PyPI - Version](https://img.shields.io/pypi/v/disco-gdl)](https://pypi.org/project/disco-gdl/#history)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/disco-gdl)](https://pypi.org/project/disco-gdl/)
+[![PyPI - License](https://img.shields.io/pypi/l/disco-gdl)](https://github.com/jsdoublel/DISCO/blob/master/LICENSE.txt)
+[![Changelog](https://img.shields.io/badge/CHANGELOG-grey)](https://github.com/jsdoublel/DISCO/blob/master/CHANGELOG.md)
+
 Decomposition Into Single-COpy gene trees ([DISCO](https://doi.org/10.1093/sysbio/syab070)) is a method for decomposing multi-copy gene-family trees while attempting to preserve orthologs and discard paralogs. These single-copy gene trees can be subsequently used by methods that can estimate species trees from single-copy gene trees such as [ASTRAL](https://github.com/smirarab/ASTRAL) or [ASTRID](https://github.com/pranjalv123/ASTRID) in order to obtain an accurate estimation of the species tree. Additionally, DISCO can be paired with concatenation analysis with methods such as [RAxML](https://github.com/amkozlov/raxml-ng). 
 
 > **NOTE:** For species tree estimation default settings are recommended; however, for orthology detection using `-m 2` is recommended so small groups are retrieved. It is also highly recommended that you use the most recent version of DISCO, as it applies the latest bugfixes (see [changelog](https://github.com/jsdoublel/DISCO/blob/master/CHANGELOG.md)). 
