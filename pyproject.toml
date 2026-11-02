@@ -1,0 +1,41 @@
+[project]
+name = "disco-gdl"
+version = "1.5.0"
+description = "Decomposition Into Single-COpy gene trees (DISCO) is a method for decomposing multi-copy gene-family trees while attempting to preserve orthologs and discard paralogs."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE.txt"]
+authors = [{ name = "James Willson", email = "jamessw156@gmail.com" }]
+keywords = ["phylogenetics", "gene trees", "gene duplication", "orthology", "species tree"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+requires-python = ">=3.12"
+dependencies = ["treeswift>=1.1,<2", "biopython>=1.85,<2"]
+
+[project.urls]
+Homepage = "https://github.com/jsdoublel/DISCO"
+Issues = "https://github.com/jsdoublel/DISCO/issues"
+Changelog = "https://github.com/jsdoublel/DISCO/blob/master/CHANGELOG.md"
+Paper = "https://doi.org/10.1093/sysbio/syab070"
+
+[project.optional-dependencies]
+test = ["pytest>=8.4"]
+
+[project.scripts]
+disco = "disco.cli:main"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["disco*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

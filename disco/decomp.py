@@ -1,6 +1,7 @@
+import os
 import treeswift
-import argparse
 import warnings
+from typing import Union
 
 
 def unroot(tree):
@@ -267,27 +268,37 @@ def relabel(tree, gene_to_species=lambda x: x):
     return tree
 
 
-def main(args):
+def decomp_main(
+    input_file_name: str,
+    output_file_name: Union[str, None] = None,
+    delimiter: Union[str, None] = None,
+    nth_delimiter: int = 1,
+    minimum: int = 4,
+    single_tree: bool = False,
+    keep_labels: bool = False,
+    outgroups: bool = False,
+    inparalogs: bool = False,
+    no_decomp: bool = False,
+    verbose: bool = False,
+):
 
-    if args.delimiter is not None:
-        gene_to_species = lambda x: args.delimiter.join(
-            x.split(args.delimiter)[: args.nth_delimiter]
-        )
+    if delimiter is not None:
+        gene_to_species = lambda x: delimiter.join(x.split(delimiter)[:nth_delimiter])
     else:
         gene_to_species = lambda x: x
 
-    if args.output is None:
-        split = args.input.rsplit(".", 1)
-        output = split[0] + "-decomp." + split[1]
+    if output_file_name is None:
+        base, ext = os.path.splitext(input_file_name)
+        output = base + "-decomp" + ext
     else:
-        output = args.output
+        output = output_file_name
 
     # delete existing outgroup file (so you don't append to it)
-    outgroup_file_name = args.input.rsplit(".", 1)[0] + "_outgroups.txt"
-    if args.outgroups:
+    outgroup_file_name = os.path.splitext(input_file_name)[0] + "_outgroups.txt"
+    if outgroups:
         open(outgroup_file_name, "w").close()
 
-    with open(args.input, "r") as fi, open(output, "w") as fo:
+    with open(input_file_name, "r") as fi, open(output, "w") as fo:
         for i, line in enumerate(fi, 1):
             tree = treeswift.read_tree_newick(line)
             if type(tree) == list:
@@ -296,16 +307,16 @@ def main(args):
                 ), "Could not interpret {} on line {:d} as a tree".format(line, i)
                 continue
 
-            if args.remove_in_paralogs:
+            if inparalogs:
                 num_paralogs = remove_in_paralogs(tree, gene_to_species)
 
             root, score, ties = get_min_root(tree, gene_to_species)
             reroot_on_edge(tree, root)
             tag(tree, gene_to_species)
 
-            if args.verbose:
+            if verbose:
                 print("Tree ", i, ": Tree has ", len(tree.root.s), " species.", sep="")
-                if args.remove_in_paralogs:
+                if inparalogs:
                     print(num_paralogs, "in-paralogs removed prior to rooting/scoring.")
                 if len(tree.root.s) < 2:
                     print("Uninformative")
@@ -320,7 +331,7 @@ def main(args):
                         score,
                         " with ",
                         tree.n_dup,
-                        " non-terminal" if args.remove_in_paralogs else "",
+                        " non-terminal" if inparalogs else "",
                         " duplications; there were ",
                         len(ties),
                         " ties.\nOutgroup: {",
@@ -330,119 +341,44 @@ def main(args):
                     )
 
             # Choose modes
-            if args.no_decomp:
+            if no_decomp:
                 out = [tree]
             else:
                 out = list(
                     filter(
-                        lambda x: x.num_nodes(internal=False) >= args.minimum,
-                        decompose(tree, args.single_tree),
+                        lambda x: x.num_nodes(internal=False) >= minimum,
+                        decompose(tree, single_tree),
                     )
                 )
 
             # Output trees
             for t in out:
-                if not args.no_decomp:
+                if not no_decomp:
                     unroot(t)
-                if not args.keep_labels:
+                if not keep_labels:
                     relabel(t, gene_to_species)
                 t.suppress_unifurcations()
                 fo.write(t.newick() + "\n")
 
-            if args.verbose:
+            if verbose:
                 print(
-                    "Decomposition strategy outputted",
-                    len(out),
-                    "tree(s) with minimum size",
-                    args.minimum,
-                    ".\n",
+                    f"Decomposition strategy outputted {len(out)} tree(s) with minimum size {minimum}\n"
                 )
 
             # output outgroups
-            if args.outgroups:
+            if outgroups:
                 og_tree = treeswift.read_tree_newick(line)
-                root, score, ties = get_min_root(og_tree, args.delimiter)
+                root, score, ties = get_min_root(og_tree, gene_to_species)
                 reroot_on_edge(og_tree, root)
-                tag(og_tree, args.delimiter)
+                tag(og_tree, gene_to_species)
                 if len(og_tree.root.s) >= 2 and og_tree.n_dup >= 1:
                     with open(outgroup_file_name, "a") as outgfile:
                         outgfile.write("Tree " + str(i) + ":\n")
                         for t in ties:
                             reroot_on_edge(og_tree, t)
-                            tag(og_tree, args.delimiter)
+                            tag(og_tree, gene_to_species)
                             outgroup = min(
                                 (len(child.s), child.s)
                                 for child in og_tree.root.child_nodes()
                             )
                             outgfile.write("{" + ",".join(outgroup[1]) + "}\n")
-
-
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(
-        description="====================== DISCO v1.4.1 ======================"
-    )
-
-    parser.add_argument(
-        "-i", "--input", type=str, help="Input tree list file", required=True
-    )
-    parser.add_argument("-o", "--output", type=str, help="Output tree list file")
-    parser.add_argument(
-        "-d",
-        "--delimiter",
-        type=str,
-        help="Delimiter separating species name from rest of leaf label",
-    )
-    parser.add_argument(
-        "-n",
-        "--nth-delimiter",
-        type=int,  # Default is 1 -- set below
-        help="Split on nth delimiter (only works with -d)",
-    )
-    parser.add_argument(
-        "-m", "--minimum", type=int, help="Minimum tree size outputted", default=4
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enables verbose output"
-    )
-    parser.add_argument(
-        "--keep-labels",
-        action="store_true",
-        help="Keep original leaf labels instead of relabeling them with their species labels (only relevant with delimiter)",
-    )
-    parser.add_argument(
-        "--single_tree", action="store_true", help="Only output single large tree"
-    )
-    parser.add_argument(
-        "--no-decomp",
-        action="store_true",
-        help="Outputs rooted trees without decomposition",
-    )
-    parser.add_argument(
-        "--outgroups",
-        action="store_true",
-        help="Output outgroups to file (including ties)",
-    )
-    parser.add_argument(
-        "--remove_in_paralogs",
-        action="store_true",
-        help="Remove in-paralogs before rooting/scoring tree.",
-    )
-
-    args = parser.parse_args()
-    if args.delimiter is None:
-        if args.nth_delimiter is not None:
-            parser.error("Cannot set -n without a delimiter")
-        if args.keep_labels:
-            parser.error("Cannot use --keep-labels without a delimiter")
-    elif args.nth_delimiter is None:
-        args.nth_delimiter = 1
-    if args.single_tree and args.no_decomp:
-        parser.error("Cannot combine --single_tree and --no-decomp")
-    if not args.verbose and args.remove_in_paralogs:
-        print(
-            "--remove_in_paralogs is meaningless without --verbose, as it does not change the optimal rooting. "
-            + "It may also slow the program."
-        )
-
-    main(args)
